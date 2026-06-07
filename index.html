@@ -2887,15 +2887,23 @@
         el.parentElement.classList.toggle("open");
       }
 
-      function tryPlayVideo() {
-        const vid = document.getElementById("story-vid");
-        if (vid.src && vid.src !== window.location.href) {
-          vid.style.display = "block";
-          document.getElementById("video-overlay").style.display = "none";
-          document.getElementById("video-inner").style.display = "none";
-          vid.play();
-        }
-      }
+function tryPlayVideo() {
+  const vid = document.getElementById("story-vid");
+
+  if (!vid) return;
+
+  document.getElementById("video-overlay")?.style && 
+    (document.getElementById("video-overlay").style.display = "none");
+
+  document.getElementById("video-inner")?.style && 
+    (document.getElementById("video-inner").style.display = "none");
+
+  vid.style.display = "block";
+
+  vid.play().catch((err) => {
+    console.log("Video play blocked:", err);
+  });
+}
       // document
       //   .getElementById("video-file-input")
       //   .addEventListener("change", function (e) {
