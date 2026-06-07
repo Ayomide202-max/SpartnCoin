@@ -1,0 +1,2948 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SPARTN — The Rescue Economy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        text-decoration: none;
+      }
+      :root {
+        --green: #39ff14;
+        --green2: #27c93f;
+        --green3: #5dff3f;
+        --bg: #041a18;
+        --bg2: #071f1d;
+        --card: rgba(255, 255, 255, 0.03);
+        --white: #ffffff;
+        --muted: #a6b0ae;
+        --glow: 0 0 40px rgba(57, 255, 20, 0.35);
+        --glow-sm: 0 0 20px rgba(57, 255, 20, 0.2);
+        --pad: clamp(20px, 5vw, 60px);
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--white);
+        font-family: "DM Sans", sans-serif;
+        overflow-x: hidden;
+        cursor: none;
+      }
+
+      /* ── CURSOR (desktop only) ── */
+      .cursor,
+      .cursor-ring {
+        position: fixed;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 99999;
+        border-radius: 50%;
+      }
+      .cursor {
+        width: 10px;
+        height: 10px;
+        background: var(--green);
+        mix-blend-mode: screen;
+        transition: transform 0.1s;
+      }
+      .cursor-ring {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(57, 255, 20, 0.4);
+        z-index: 99998;
+        transition:
+          width 0.2s,
+          height 0.2s;
+      }
+      @media (hover: none) {
+        .cursor,
+        .cursor-ring {
+          display: none;
+        }
+        body {
+          cursor: auto;
+        }
+      }
+
+      /* ── SCROLLBAR ── */
+      ::-webkit-scrollbar {
+        width: 3px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--green2);
+        border-radius: 2px;
+      }
+
+      /* ── LOADER ── */
+      #loader {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 24px;
+        transition:
+          opacity 0.6s,
+          transform 0.6s;
+      }
+      #loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(1.04);
+      }
+      .loader-logo {
+        width: clamp(80px, 20vw, 120px);
+        animation: pulse-glow 1.5s ease-in-out infinite;
+      }
+      .loader-bar {
+        width: clamp(140px, 40vw, 200px);
+        height: 2px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .loader-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--green2), var(--green));
+        width: 0;
+        animation: load 2.1s ease forwards;
+      }
+      @keyframes load {
+        to {
+          width: 100%;
+        }
+      }
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.4));
+        }
+        50% {
+          filter: drop-shadow(0 0 24px rgba(57, 255, 20, 0.9));
+        }
+      }
+
+      /* ── NAV ── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        padding: 18px var(--pad);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition:
+          background 0.4s,
+          padding 0.3s;
+      }
+      nav.scrolled {
+        background: rgba(4, 26, 24, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 12px var(--pad);
+        border-bottom: 1px solid rgba(57, 255, 20, 0.1);
+      }
+      .nav-logo {
+        height: clamp(34px, 5vw, 44px);
+        cursor: pointer;
+        filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.3));
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: clamp(16px, 3vw, 36px);
+      }
+      .nav-links {
+        display: flex;
+        gap: clamp(16px, 2.5vw, 32px);
+        list-style: none;
+      }
+      .nav-links a {
+        color: var(--muted);
+        font-size: clamp(11px, 1.2vw, 13px);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: color 0.2s;
+        font-weight: 500;
+      }
+      .nav-links a:hover {
+        color: var(--green);
+      }
+      .nav-cta {
+        background: transparent;
+        border: 1px solid var(--green);
+        color: var(--green);
+        padding: 9px 22px;
+        border-radius: 2px;
+        font-size: clamp(11px, 1.2vw, 13px);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: "DM Sans", sans-serif;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .nav-cta:hover {
+        background: var(--green);
+        color: var(--bg);
+        box-shadow: var(--glow);
+      }
+
+      /* Hamburger */
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        padding: 4px;
+        background: none;
+        border: none;
+      }
+      .hamburger span {
+        display: block;
+        width: 24px;
+        height: 2px;
+        background: var(--white);
+        transition: all 0.3s;
+      }
+      .hamburger.open span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .hamburger.open span:nth-child(2) {
+        opacity: 0;
+      }
+      .hamburger.open span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      /* Mobile drawer */
+      .mobile-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(4, 26, 24, 0.98);
+        backdrop-filter: blur(30px);
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 32px;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .mobile-menu.open {
+        transform: none;
+      }
+      .mobile-menu a {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(32px, 8vw, 52px);
+        letter-spacing: 0.08em;
+        color: var(--white);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .mobile-menu a:hover {
+        color: var(--green);
+      }
+      .mobile-menu .mob-cta {
+        margin-top: 12px;
+        background: var(--green);
+        color: var(--bg);
+        padding: 14px 40px;
+        border-radius: 2px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        box-shadow: var(--glow);
+      }
+
+      /* ── HERO ── */
+      #hero {
+        position: relative;
+        height: 100svh;
+        min-height: 600px;
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+      }
+      .hero-bg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center top;
+        transition: transform 0.1s linear;
+        will-change: transform;
+      }
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(4, 26, 24, 0.25) 0%,
+          rgba(4, 26, 24, 0.05) 30%,
+          rgba(4, 26, 24, 0.55) 65%,
+          rgba(4, 26, 24, 1) 100%
+        );
+      }
+      .hero-overlay-left {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to right,
+          rgba(4, 26, 24, 0.85) 0%,
+          transparent 65%
+        );
+      }
+      #particles {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 0 var(--pad) clamp(60px, 8vh, 100px);
+        max-width: min(900px, 90vw);
+      }
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(57, 255, 20, 0.3);
+        background: rgba(57, 255, 20, 0.05);
+        padding: 6px 14px;
+        border-radius: 2px;
+        font-size: clamp(9px, 1.5vw, 11px);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin-bottom: clamp(16px, 3vw, 28px);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeUp 0.8s 2.2s ease forwards;
+      }
+      .badge-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--green);
+        border-radius: 50%;
+        animation: pulse-dot 2s infinite;
+        min-width: 6px;
+      }
+      @keyframes pulse-dot {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .hero-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(60px, 13vw, 160px);
+        line-height: 0.92;
+        letter-spacing: 0.02em;
+        margin-bottom: 12px;
+        opacity: 0;
+        transform: translateY(40px);
+        animation: fadeUp 1s 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      .hero-title span {
+        color: var(--green);
+        text-shadow: 0 0 60px rgba(57, 255, 20, 0.5);
+      }
+      .hero-sub {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(16px, 3vw, 36px);
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin-bottom: clamp(14px, 2vw, 24px);
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeUp 0.9s 2.6s ease forwards;
+      }
+      .hero-desc {
+        max-width: min(520px, 85vw);
+        font-size: clamp(13px, 1.8vw, 16px);
+        line-height: 1.7;
+        color: var(--muted);
+        margin-bottom: clamp(28px, 4vw, 44px);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeUp 0.9s 2.8s ease forwards;
+      }
+      .hero-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeUp 0.9s 3s ease forwards;
+        
+      }
+      .btn-primary {
+        background: var(--green);
+        color: var(--bg);
+        padding: clamp(12px, 2vw, 16px) clamp(24px, 4vw, 36px);
+        border: none;
+        border-radius: 2px;
+        font-size: clamp(12px, 1.4vw, 14px);
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-family: "DM Sans", sans-serif;
+        transition: all 0.2s;
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+      }
+      .btn-primary:hover {
+        box-shadow: 0 0 50px rgba(57, 255, 20, 0.6);
+        transform: translateY(-2px);
+      }
+      .btn-secondary {
+        background: transparent;
+        color: var(--white);
+        padding: clamp(12px, 2vw, 16px) clamp(24px, 4vw, 36px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        font-size: clamp(12px, 1.4vw, 14px);
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        font-family: "DM Sans", sans-serif;
+        transition: all 0.2s;
+        backdrop-filter: blur(10px);
+      }
+      .btn-secondary:hover {
+        border-color: var(--green);
+        color: var(--green);
+      }
+
+      /* Hero metrics */
+      .hero-metrics {
+        position: absolute;
+        right: var(--pad);
+        bottom: clamp(60px, 8vh, 100px);
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(14px, 2vw, 24px);
+        opacity: 0;
+        animation: fadeLeft 1s 3.2s ease forwards;
+      }
+      @keyframes fadeLeft {
+        from {
+          opacity: 0;
+          transform: translateX(30px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .metric {
+        text-align: right;
+      }
+      .metric-val {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(28px, 4vw, 42px);
+        color: var(--green);
+        letter-spacing: 0.05em;
+        line-height: 1;
+      }
+      .metric-label {
+        font-size: clamp(9px, 1vw, 11px);
+        color: var(--muted);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+
+      /* Scroll indicator */
+      .scroll-ind {
+        position: absolute;
+        bottom: clamp(12px, 2vh, 24px);
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        opacity: 0;
+        animation: fadeUp 1s 3.5s ease forwards;
+        color: var(--muted);
+        font-size: 9px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+      .scroll-line {
+        width: 1px;
+        height: 40px;
+        background: linear-gradient(to bottom, var(--green), transparent);
+        animation: scroll-pulse 2s ease-in-out infinite;
+      }
+      @keyframes scroll-pulse {
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: scaleY(0.8);
+        }
+        50% {
+          opacity: 1;
+          transform: scaleY(1);
+        }
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* ── SECTION COMMONS ── */
+      section {
+        padding: clamp(70px, 10vh, 130px) var(--pad);
+      }
+      .section-label {
+        font-size: clamp(9px, 1.2vw, 11px);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin-bottom: 14px;
+        display: block;
+      }
+      .section-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(40px, 6vw, 80px);
+        line-height: 1;
+        letter-spacing: 0.03em;
+        margin-bottom: 22px;
+      }
+      .section-body {
+        font-size: clamp(14px, 1.8vw, 17px);
+        line-height: 1.8;
+        color: var(--muted);
+        max-width: 640px;
+      }
+
+      /* ── REVEAL ── */
+      .reveal {
+        opacity: 0;
+        transform: translateY(36px);
+        transition:
+          opacity 0.8s,
+          transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: none;
+      }
+      .reveal-left {
+        opacity: 0;
+        transform: translateX(-36px);
+        transition:
+          opacity 0.8s,
+          transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .reveal-left.visible {
+        opacity: 1;
+        transform: none;
+      }
+      .reveal-right {
+        opacity: 0;
+        transform: translateX(36px);
+        transition:
+          opacity 0.8s,
+          transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .reveal-right.visible {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* ── TICKER ── */
+      .ticker-wrap {
+        background: rgba(57, 255, 20, 0.05);
+        border-top: 1px solid rgba(57, 255, 20, 0.1);
+        border-bottom: 1px solid rgba(57, 255, 20, 0.1);
+        padding: 10px 0;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .ticker-inner {
+        display: inline-flex;
+        gap: 50px;
+        animation: ticker 30s linear infinite;
+      }
+      @keyframes ticker {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+      .ticker-item {
+        font-size: clamp(9px, 1.2vw, 11px);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .ticker-item span {
+        color: var(--green);
+      }
+
+      /* ── GLOW DIVIDER ── */
+      .glow-divider {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--green),
+          transparent
+        );
+        opacity: 0.3;
+      }
+
+      /* ── WHY SPARTN ── */
+      #why {
+        background: var(--bg2);
+        position: relative;
+        overflow: hidden;
+      }
+      #why::before {
+        content: "";
+        position: absolute;
+        top: -200px;
+        right: -200px;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          rgba(57, 255, 20, 0.06) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .why-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(40px, 6vw, 80px);
+        align-items: center;
+        margin-top: clamp(40px, 5vh, 60px);
+      }
+      .why-image-stack {
+        position: relative;
+        height: clamp(320px, 50vw, 580px);
+      }
+      .why-img-main {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 75%;
+        height: 85%;
+        object-fit: cover;
+        border-radius: 2px;
+        filter: brightness(0.9);
+      }
+      .why-img-secondary {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 55%;
+        height: 55%;
+        object-fit: cover;
+        border-radius: 2px;
+        border: 3px solid var(--bg2);
+        filter: brightness(0.85);
+      }
+      .why-accent {
+        position: absolute;
+        bottom: 16px;
+        left: 16px;
+        background: rgba(4, 26, 24, 0.92);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(57, 255, 20, 0.2);
+        border-radius: 2px;
+        padding: 16px 20px;
+      }
+      .why-accent-val {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(24px, 3vw, 36px);
+        color: var(--green);
+      }
+      .why-accent-txt {
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .why-points {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: clamp(24px, 3vw, 36px);
+      }
+      .why-point {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        padding: 16px;
+        border-radius: 2px;
+        border: 1px solid transparent;
+        background: var(--card);
+        backdrop-filter: blur(10px);
+        transition:
+          border-color 0.3s,
+          background 0.3s;
+      }
+      .why-point:hover {
+        border-color: rgba(57, 255, 20, 0.2);
+        background: rgba(57, 255, 20, 0.04);
+      }
+      .why-point-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border: 1px solid rgba(57, 255, 20, 0.3);
+        border-radius: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+      .why-point-text h4 {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(13px, 1.4vw, 15px);
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+      .why-point-text p {
+        font-size: clamp(12px, 1.3vw, 14px);
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      /* ── RESCUE ECONOMY ── */
+      #economy {
+        background: var(--bg);
+      }
+      .economy-flow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0;
+        margin-top: clamp(40px, 5vh, 60px);
+      }
+      .flow-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: clamp(16px, 2.5vw, 28px) clamp(12px, 2vw, 22px);
+        background: var(--card);
+        border: 1px solid rgba(57, 255, 20, 0.1);
+        border-radius: 2px;
+        min-width: clamp(100px, 14vw, 155px);
+        transition: all 0.3s;
+        cursor: default;
+      }
+      .flow-item:hover {
+        border-color: rgba(57, 255, 20, 0.4);
+        background: rgba(57, 255, 20, 0.05);
+        transform: translateY(-4px);
+        box-shadow: var(--glow-sm);
+      }
+      .flow-icon {
+        font-size: clamp(20px, 3vw, 28px);
+      }
+      .flow-label {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(10px, 1.2vw, 13px);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-align: center;
+      }
+      .flow-arrow {
+        font-size: clamp(14px, 2vw, 20px);
+        color: var(--green);
+        opacity: 0.6;
+        padding: 0 2px;
+      }
+
+      /* ── GALLERY ── */
+      #gallery {
+        background: var(--bg2);
+      }
+      .gallery-intro {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(30px, 5vw, 60px);
+        align-items: end;
+        margin-bottom: clamp(40px, 5vh, 60px);
+      }
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: clamp(8px, 1.5vw, 16px);
+      }
+      .gallery-card {
+        position: relative;
+        overflow: hidden;
+        border-radius: 2px;
+        aspect-ratio: 3/4;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: border-color 0.3s;
+      }
+      .gallery-card:hover {
+        border-color: rgba(57, 255, 20, 0.3);
+      }
+      .gallery-card:nth-child(2) {
+        aspect-ratio: 3/5;
+      }
+      .gallery-card:nth-child(5) {
+        aspect-ratio: 4/3;
+        grid-column: span 2;
+      }
+      .gallery-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition:
+          transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+          filter 0.4s;
+        filter: brightness(0.8) saturate(0.9);
+      }
+      .gallery-card:hover img {
+        transform: scale(1.06);
+        filter: brightness(0.9) saturate(1.1);
+      }
+      .gallery-card-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(4, 26, 24, 0.95) 0%,
+          transparent 50%
+        );
+        opacity: 0;
+        transition: opacity 0.3s;
+        display: flex;
+        align-items: flex-end;
+        padding: 16px;
+      }
+      .gallery-card:hover .gallery-card-overlay {
+        opacity: 1;
+      }
+      .gallery-card-info h3 {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(13px, 1.6vw, 16px);
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .gallery-card-info p {
+        font-size: clamp(11px, 1.2vw, 12px);
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .gallery-status {
+        display: inline-block;
+        margin-top: 6px;
+        background: rgba(57, 255, 20, 0.15);
+        border: 1px solid var(--green);
+        color: var(--green);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 3px 9px;
+        border-radius: 2px;
+      }
+
+      /* ── STORY VIDEO ── */
+      #story-video {
+        background: var(--bg);
+        padding: clamp(70px, 10vh, 130px) var(--pad);
+      }
+      .story-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(40px, 6vw, 80px);
+        align-items: center;
+      }
+      .story-text .section-body {
+        margin-bottom: 28px;
+      }
+      .video-placeholder {
+        position: relative;
+        border-radius: 2px;
+        overflow: hidden;
+        aspect-ratio: 16/9;
+        background: #000;
+        border: 1px solid rgba(57, 255, 20, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        cursor: pointer;
+        transition: border-color 0.3s;
+      }
+      .video-placeholder:hover {
+        border-color: rgba(57, 255, 20, 0.4);
+      }
+      .video-placeholder video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        inset: 0;
+      }
+      .video-placeholder-inner {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        text-align: center;
+        padding: 24px;
+      }
+      .video-placeholder-bg {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(4, 26, 24, 0.95),
+          rgba(7, 31, 29, 0.9)
+        );
+        z-index: 1;
+      }
+      .play-btn {
+        width: clamp(56px, 8vw, 72px);
+        height: clamp(56px, 8vw, 72px);
+        border-radius: 50%;
+        border: 2px solid var(--green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(20px, 3vw, 26px);
+        color: var(--green);
+        background: rgba(57, 255, 20, 0.1);
+        transition: all 0.3s;
+        position: relative;
+        z-index: 2;
+      }
+      .play-btn::before {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 1px solid rgba(57, 255, 20, 0.2);
+        animation: ping 2s ease-in-out infinite;
+      }
+      @keyframes ping {
+        0%,
+        100% {
+          opacity: 0.6;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0;
+          transform: scale(1.4);
+        }
+      }
+      .video-placeholder:hover .play-btn {
+        background: rgba(57, 255, 20, 0.2);
+        box-shadow: var(--glow-sm);
+      }
+      .video-label {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(13px, 1.6vw, 15px);
+        font-weight: 700;
+        color: var(--white);
+        position: relative;
+        z-index: 2;
+      }
+      .video-sublabel {
+        font-size: clamp(11px, 1.2vw, 12px);
+        color: var(--muted);
+        position: relative;
+        z-index: 2;
+      }
+      .video-dev-note {
+        margin-top: 12px;
+        font-size: 11px;
+        color: rgba(166, 176, 174, 0.5);
+        font-style: italic;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding-top: 12px;
+        line-height: 1.6;
+      }
+      .video-upload-dev {
+        margin-top: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .video-upload-dev label {
+        border: 1px solid rgba(57, 255, 20, 0.25);
+        color: var(--green);
+        padding: 7px 16px;
+        border-radius: 2px;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .video-upload-dev label:hover {
+        background: rgba(57, 255, 20, 0.1);
+      }
+      .video-upload-dev span {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      #video-file-input {
+        display: none;
+      }
+
+      /* ── WHY WEB3 ── */
+      #web3 {
+        background: var(--bg2);
+        position: relative;
+        overflow: hidden;
+      }
+      #web3::after {
+        content: "";
+        position: absolute;
+        bottom: -200px;
+        left: -100px;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(
+          circle,
+          rgba(57, 255, 20, 0.05) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .web3-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(40px, 6vw, 80px);
+        align-items: center;
+        margin-top: clamp(40px, 5vh, 60px);
+      }
+      .web3-points {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .web3-point {
+        display: flex;
+        gap: clamp(14px, 2vw, 24px);
+        padding: clamp(18px, 2.5vh, 28px) 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .web3-num {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(32px, 4vw, 48px);
+        color: rgba(57, 255, 20, 0.15);
+        line-height: 1;
+        min-width: clamp(36px, 4vw, 50px);
+      }
+      .web3-text h4 {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(14px, 1.6vw, 17px);
+        font-weight: 700;
+        margin-bottom: 7px;
+      }
+      .web3-text p {
+        font-size: clamp(12px, 1.4vw, 14px);
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .web3-image {
+        position: relative;
+      }
+      .web3-img {
+        width: 100%;
+        aspect-ratio: 3/4;
+        object-fit: cover;
+        border-radius: 2px;
+        filter: brightness(0.85) saturate(1.1);
+      }
+      .web3-img-caption {
+        position: absolute;
+        bottom: -18px;
+        left: -18px;
+        background: rgba(4, 26, 24, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(57, 255, 20, 0.2);
+        border-radius: 2px;
+        padding: 20px 24px;
+        max-width: clamp(200px, 24vw, 260px);
+      }
+      .web3-img-caption strong {
+        display: block;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(18px, 2vw, 22px);
+        color: var(--green);
+        letter-spacing: 0.05em;
+        margin-bottom: 5px;
+      }
+      .web3-img-caption span {
+        font-size: clamp(11px, 1.2vw, 12px);
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      /* ── TOKEN UTILITY ── */
+      #utility {
+        background: var(--bg);
+      }
+      .utility-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: clamp(10px, 1.5vw, 16px);
+        margin-top: clamp(40px, 5vh, 60px);
+      }
+      .utility-card {
+        padding: clamp(20px, 3vw, 32px) clamp(16px, 2vw, 24px);
+        background: var(--card);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 2px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+      }
+      .utility-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--green2), var(--green));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s;
+      }
+      .utility-card:hover {
+        border-color: rgba(57, 255, 20, 0.2);
+        background: rgba(57, 255, 20, 0.03);
+        transform: translateY(-4px);
+      }
+      .utility-card:hover::before {
+        transform: scaleX(1);
+      }
+      .utility-icon {
+        font-size: clamp(22px, 2.8vw, 28px);
+        margin-bottom: 14px;
+      }
+      .utility-card h3 {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(12px, 1.4vw, 15px);
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .utility-card p {
+        font-size: clamp(11px, 1.2vw, 13px);
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      /* ── TOKENOMICS ── */
+      #tokenomics {
+        background: var(--bg2);
+      }
+      .token-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(40px, 6vw, 80px);
+        align-items: center;
+        margin-top: clamp(40px, 5vh, 60px);
+      }
+      .token-chart {
+        position: relative;
+        width: clamp(220px, 30vw, 320px);
+        height: clamp(220px, 30vw, 320px);
+        margin: auto;
+      }
+      .donut-svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+      .donut-total {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        pointer-events: none;
+      }
+      .donut-total strong {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(22px, 3vw, 32px);
+        color: var(--white);
+        letter-spacing: 0.05em;
+        display: block;
+        line-height: 1;
+      }
+      .donut-total span {
+        font-size: clamp(9px, 1vw, 11px);
+        color: var(--muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .token-legend {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(10px, 1.5vh, 16px);
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 2px;
+        transition: background 0.2s;
+      }
+      .legend-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        min-width: 10px;
+      }
+      .legend-text {
+        flex: 1;
+      }
+      .legend-text strong {
+        font-size: clamp(12px, 1.4vw, 14px);
+        display: block;
+        margin-bottom: 2px;
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+      }
+      .legend-text span {
+        font-size: clamp(10px, 1.1vw, 12px);
+        color: var(--muted);
+      }
+      .legend-pct {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(18px, 2.5vw, 24px);
+        letter-spacing: 0.05em;
+      }
+      .token-info {
+        display: flex;
+        gap: clamp(12px, 2vw, 24px);
+        flex-wrap: wrap;
+        margin-top: 28px;
+      }
+      .token-stat {
+        flex: 1;
+        min-width: clamp(120px, 14vw, 140px);
+        padding: clamp(14px, 2vw, 20px);
+        background: var(--card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 2px;
+      }
+      .token-stat-val {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(20px, 2.5vw, 28px);
+        color: var(--green);
+        letter-spacing: 0.05em;
+      }
+      .token-stat-label {
+        font-size: clamp(9px, 1vw, 11px);
+        color: var(--muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-top: 4px;
+      }
+
+      /* ── ROADMAP ── */
+      #roadmap {
+        background: var(--bg);
+      }
+      .roadmap-track {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        margin-top: clamp(40px, 5vh, 60px);
+        position: relative;
+      }
+      .roadmap-track::before {
+        content: "";
+        position: absolute;
+        top: 40px;
+        left: 12.5%;
+        right: 12.5%;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--green2),
+          var(--green),
+          var(--green2),
+          transparent
+        );
+      }
+      .roadmap-phase {
+        padding: clamp(16px, 2.5vw, 24px) clamp(12px, 2vw, 20px);
+        position: relative;
+        border-radius: 2px;
+        transition: background 0.3s;
+      }
+      .roadmap-phase:hover {
+        background: rgba(57, 255, 20, 0.03);
+      }
+      .phase-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--green);
+        border: 3px solid var(--bg);
+        margin: 0 auto 20px;
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+        position: relative;
+        z-index: 1;
+      }
+      .phase-num {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(11px, 1.2vw, 13px);
+        letter-spacing: 0.2em;
+        color: var(--green);
+        margin-bottom: 10px;
+        text-align: center;
+      }
+      .phase-title {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(15px, 1.8vw, 18px);
+        font-weight: 800;
+        margin-bottom: 14px;
+        text-align: center;
+      }
+      .phase-items {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .phase-items li {
+        font-size: clamp(11px, 1.3vw, 13px);
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .phase-items li::before {
+        content: "›";
+        color: var(--green);
+        font-size: 15px;
+      }
+
+      /* ── COMMUNITY ── */
+      #community {
+        background: var(--bg2);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      #community::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(800px, 90vw);
+        height: 400px;
+        background: radial-gradient(
+          ellipse,
+          rgba(57, 255, 20, 0.08) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .community-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(40px, 9vw, 100px);
+        line-height: 1;
+        letter-spacing: 0.03em;
+      }
+      .community-title em {
+        color: var(--green);
+        font-style: normal;
+      }
+      .community-body {
+        max-width: min(540px, 85vw);
+        margin: 20px auto 48px;
+        font-size: clamp(14px, 1.8vw, 17px);
+        color: var(--muted);
+        line-height: 1.7;
+      }
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: clamp(12px, 2vw, 24px);
+        flex-wrap: wrap;
+      }
+      .social-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: clamp(14px, 2vw, 20px) clamp(20px, 3.5vw, 32px);
+        background: var(--card);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 2px;
+        text-decoration: none;
+        color: var(--white);
+        transition: all 0.3s;
+        min-width: clamp(130px, 16vw, 160px);
+        justify-content: center;
+      }
+      .social-card:hover {
+        border-color: rgba(57, 255, 20, 0.3);
+        background: rgba(57, 255, 20, 0.05);
+        color: var(--green);
+        transform: translateY(-3px);
+        box-shadow: var(--glow-sm);
+      }
+      .social-icon {
+        font-size: clamp(18px, 2.5vw, 22px);
+      }
+      .social-name {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(13px, 1.5vw, 15px);
+        font-weight: 700;
+      }
+
+      /* ── FAQ ── */
+      .faq-wrap {
+        max-width: min(860px, 90vw);
+        margin: 0 auto;
+        padding: clamp(70px, 10vh, 130px) var(--pad);
+      }
+      .faq-list {
+        margin-top: clamp(30px, 4vh, 50px);
+        display: flex;
+        flex-direction: column;
+      }
+      .faq-item {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .faq-q {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: clamp(18px, 2.5vh, 24px) 0;
+        cursor: pointer;
+        font-family: "Syne", sans-serif;
+        font-size: clamp(14px, 1.8vw, 17px);
+        font-weight: 700;
+        transition: color 0.2s;
+        user-select: none;
+        gap: 16px;
+      }
+      .faq-q:hover {
+        color: var(--green);
+      }
+      .faq-toggle {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 1px solid rgba(57, 255, 20, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--green);
+        font-size: 18px;
+        min-width: 26px;
+        transition:
+          transform 0.3s,
+          background 0.2s;
+      }
+      .faq-item.open .faq-toggle {
+        transform: rotate(45deg);
+        background: rgba(57, 255, 20, 0.1);
+      }
+      .faq-a {
+        font-size: clamp(13px, 1.5vw, 15px);
+        color: var(--muted);
+        line-height: 1.8;
+        max-height: 0;
+        overflow: hidden;
+        transition:
+          max-height 0.4s,
+          padding 0.4s;
+      }
+      .faq-item.open .faq-a {
+        max-height: 300px;
+        padding-bottom: 22px;
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        background: var(--bg);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding: clamp(40px, 6vh, 60px) var(--pad) clamp(24px, 4vh, 40px);
+      }
+      .footer-top {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: clamp(30px, 5vw, 60px);
+        margin-bottom: clamp(40px, 5vh, 60px);
+      }
+      .footer-brand img {
+        height: clamp(36px, 5vw, 50px);
+        margin-bottom: 16px;
+        filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.2));
+      }
+      .footer-brand p {
+        font-size: clamp(11px, 1.3vw, 13px);
+        color: var(--muted);
+        line-height: 1.7;
+        max-width: 260px;
+        margin-bottom: 16px;
+      }
+      .footer-col h4 {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(10px, 1.2vw, 13px);
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+        color: var(--muted);
+      }
+      .footer-col a {
+        display: block;
+        font-size: clamp(11px, 1.3vw, 13px);
+        color: var(--muted);
+        text-decoration: none;
+        margin-bottom: 10px;
+        transition: color 0.2s;
+      }
+      .footer-col a:hover {
+        color: var(--green);
+      }
+      .footer-contract {
+        background: rgba(57, 255, 20, 0.05);
+        border: 1px solid rgba(57, 255, 20, 0.15);
+        border-radius: 2px;
+        padding: 12px 16px;
+        font-size: clamp(9px, 1.1vw, 11px);
+        color: var(--muted);
+        font-family: monospace;
+        letter-spacing: 0.04em;
+        word-break: break-all;
+      }
+      .footer-contract span {
+        color: var(--green);
+      }
+      .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .footer-copy {
+        font-size: clamp(10px, 1.1vw, 12px);
+        color: rgba(166, 176, 174, 0.4);
+      }
+      .footer-disclaimer {
+        font-size: clamp(9px, 1vw, 11px);
+        color: rgba(166, 176, 174, 0.3);
+        max-width: 500px;
+        text-align: right;
+        line-height: 1.5;
+      }
+      .footer-social {
+        display: flex;
+        gap: 12px;
+      }
+      .footer-social a {
+        width: 34px;
+        height: 34px;
+        border-radius: 2px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+      .footer-social a:hover {
+        border-color: rgba(57, 255, 20, 0.3);
+        color: var(--green);
+      }
+
+      /* ══════════════════════════════════════
+   RESPONSIVE — LARGE TABLET (≤1200px)
+══════════════════════════════════════ */
+      @media (max-width: 1200px) {
+        .web3-img-caption {
+          max-width: 220px;
+          padding: 16px 18px;
+        }
+        .footer-top {
+          grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        }
+      }
+
+      /* ══════════════════════════════════════
+   RESPONSIVE — TABLET (≤1024px)
+══════════════════════════════════════ */
+      @media (max-width: 1024px) {
+        .utility-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .footer-top {
+          grid-template-columns: 1fr 1fr;
+          gap: 36px;
+        }
+        .roadmap-track {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 24px;
+        }
+        .roadmap-track::before {
+          display: none;
+        }
+        .why-grid,
+        .web3-grid,
+        .story-container {
+          gap: clamp(30px, 4vw, 50px);
+        }
+        .token-layout {
+          gap: clamp(30px, 4vw, 50px);
+        }
+        .gallery-grid {
+          gap: 10px;
+        }
+        .web3-img-caption {
+          bottom: -14px;
+          left: -14px;
+        }
+      }
+
+      /* ══════════════════════════════════════
+   RESPONSIVE — MOBILE (≤768px)
+══════════════════════════════════════ */
+      @media (max-width: 768px) {
+        /* NAV */
+        .nav-links {
+          display: none;
+        }
+        .hamburger {
+          display: flex;
+        }
+        .nav-cta {
+          display: none;
+        }
+
+        /* HERO */
+        #hero {
+          flex-direction: column;
+          justify-content: flex-end;
+          align-items: flex-start;
+        }
+        .hero-bg {
+          background-position: 60% center;
+        }
+        .hero-overlay-left {
+          background: linear-gradient(
+            to bottom,
+            rgba(4, 26, 24, 0.6) 0%,
+            transparent 60%
+          );
+        }
+        .hero-content {
+          padding: 0 var(--pad) clamp(16px, 3vh, 28px);
+          width: 100%;
+        }
+        .hero-metrics {
+          position: static;
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 12px 24px;
+          width: 100%;
+          padding: 16px var(--pad) clamp(30px, 5vh, 50px);
+          margin-bottom: 0;
+          opacity: 0;
+          animation: fadeUp 1s 3.2s ease forwards;
+        }
+        .metric {
+          text-align: left;
+        }
+        .scroll-ind {
+          display: none;
+        }
+
+        /* ALL 2-COL GRIDS → SINGLE COL */
+        .why-grid,
+        .web3-grid,
+        .token-layout,
+        .story-container,
+        .gallery-intro {
+          grid-template-columns: 1fr;
+          gap: clamp(28px, 5vw, 44px);
+        }
+
+        /* WHY */
+        .why-image-stack {
+          height: clamp(260px, 65vw, 380px);
+        }
+        .why-img-secondary {
+          display: none;
+        } /* simplify on mobile */
+
+        /* ECONOMY FLOW */
+        .economy-flow {
+          gap: 6px;
+          justify-content: flex-start;
+        }
+        .flow-arrow {
+          display: none;
+        }
+        .flow-item {
+          min-width: calc(50% - 6px);
+          flex: 1 1 calc(50% - 6px);
+        }
+
+        /* GALLERY */
+        .gallery-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+        }
+        .gallery-card:nth-child(2) {
+          aspect-ratio: 3/4;
+        }
+        .gallery-card:nth-child(5) {
+          grid-column: span 2;
+          aspect-ratio: 16/9;
+        }
+        .gallery-card-overlay {
+          opacity: 1;
+          background: linear-gradient(
+            to top,
+            rgba(4, 26, 24, 0.92) 0%,
+            transparent 60%
+          );
+        }
+
+        /* STORY VIDEO */
+        .story-container {
+          grid-template-columns: 1fr;
+        }
+
+        /* WEB3 */
+        .web3-img {
+          aspect-ratio: 16/9;
+        }
+        .web3-img-caption {
+          position: static;
+          margin-top: 14px;
+          max-width: 100%;
+          left: auto;
+          bottom: auto;
+        }
+
+        /* UTILITY */
+        .utility-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        /* TOKENOMICS */
+        .token-layout {
+          grid-template-columns: 1fr;
+        }
+        .token-chart {
+          width: clamp(200px, 55vw, 280px);
+          height: clamp(200px, 55vw, 280px);
+        }
+
+        /* ROADMAP */
+        .roadmap-track {
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+        .roadmap-track::before {
+          display: none;
+        }
+
+        /* COMMUNITY */
+        .social-links {
+          gap: 10px;
+        }
+        .social-card {
+          min-width: calc(50% - 5px);
+          flex: 1 1 calc(50% - 5px);
+        }
+
+        /* FOOTER */
+        .footer-top {
+          grid-template-columns: 1fr 1fr;
+          gap: 28px;
+        }
+        .footer-bottom {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 14px;
+        }
+        .footer-disclaimer {
+          text-align: left;
+          max-width: 100%;
+        }
+
+        /* VIDEO DEV TOOLS — hidden on mobile, not needed */
+        .video-dev-note,
+        .video-upload-dev {
+          display: none;
+        }
+      }
+
+      /* ══════════════════════════════════════
+   RESPONSIVE — SMALL MOBILE (≤480px)
+══════════════════════════════════════ */
+      @media (max-width: 480px) {
+        /* NAV */
+        nav {
+          padding: 14px var(--pad);
+        }
+
+        /* HERO */
+        .hero-buttons {
+          flex-direction: column;
+          width: 100%;
+        }
+        .btn-primary,
+        .btn-secondary {
+          width: 100%;
+          text-align: center;
+          justify-content: center;
+        }
+        .hero-metrics {
+          gap: 10px 20px;
+        }
+        .metric-val {
+          font-size: clamp(22px, 7vw, 30px);
+        }
+
+        /* ECONOMY */
+        .flow-item {
+          min-width: calc(50% - 6px);
+        }
+
+        /* GALLERY */
+        .gallery-grid {
+          grid-template-columns: 1fr;
+        }
+        .gallery-card:nth-child(2) {
+          aspect-ratio: 3/4;
+        }
+        .gallery-card:nth-child(5) {
+          grid-column: span 1;
+          aspect-ratio: 3/4;
+        }
+
+        /* UTILITY */
+        .utility-grid {
+          grid-template-columns: 1fr;
+        }
+
+        /* ROADMAP */
+        .roadmap-track {
+          grid-template-columns: 1fr;
+        }
+        .roadmap-phase {
+          text-align: left;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 20px 16px;
+          border: 1px solid rgba(57, 255, 20, 0.08);
+          border-radius: 2px;
+          background: var(--card);
+        }
+        .phase-dot {
+          margin: 0 0 14px;
+        }
+        .phase-num,
+        .phase-title {
+          text-align: left;
+        }
+
+        /* TOKENOMICS */
+        .token-info {
+          flex-direction: column;
+        }
+        .token-stat {
+          min-width: 100%;
+        }
+
+        /* COMMUNITY */
+        .social-card {
+          min-width: 100%;
+          flex: 1 1 100%;
+        }
+
+        /* FOOTER */
+        .footer-top {
+          grid-template-columns: 1fr;
+        }
+        .footer-bottom {
+          gap: 10px;
+        }
+
+        /* FAQ */
+        .faq-q {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- LOADER -->
+    <div id="loader">
+      <img class="loader-logo" id="loader-logo" src="" alt="SPARTN" />
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+    </div>
+
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#why" onclick="closeMenu()">Story</a>
+      <a href="#gallery" onclick="closeMenu()">Rescues</a>
+      <a href="#tokenomics" onclick="closeMenu()">Tokenomics</a>
+      <a href="#roadmap" onclick="closeMenu()">Roadmap</a>
+      <a href="#community" onclick="closeMenu()">Community</a>
+      <a href="#faq" onclick="closeMenu()">FAQ</a>
+      <button class="mob-cta" onclick="closeMenu()">Buy $SPARTN</button>
+    </div>
+
+    <!-- NAV -->
+    <nav id="nav">
+      <img class="nav-logo" id="nav-logo" src="" alt="SPARTN" />
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="#">Home</a></li>
+          <li><a href="#why">Story</a></li>
+          <li><a href="#gallery">Rescues</a></li>
+          <li><a href="#tokenomics">Tokenomics</a></li>
+          <li><a href="#roadmap">Roadmap</a></li>
+          <li><a href="#community">Community</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+        <button class="nav-cta">Buy $SPARTN</button>
+        <button
+          class="hamburger"
+          id="hamburger"
+          onclick="toggleMenu()"
+          aria-label="Menu"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero">
+      <canvas id="particles"></canvas>
+      <div class="hero-bg" id="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-overlay-left"></div>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>$SPARTN Live on Solana
+        </div>
+        <h1 class="hero-title">SP<span>A</span>RTN</h1>
+        <p class="hero-sub">The Rescue Economy</p>
+        <p class="hero-desc">
+          Built on real rescue stories. Powered by Web3. Driven by community. A
+          memecoin transforming real-world rescue stories into a global
+          movement.
+        </p>
+        <div class="hero-buttons">
+          <a href="#" target="_blank" class="btn-primary">
+    Buy $SPARTN
+  </a>
+           <a href="https://t.me/+QYg5V0yZXIFlYTcx" target="_blank" class="btn-secondary">
+    Join Community
+  </a>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div class="metric">
+          <div class="metric-val">+</div>
+          <div class="metric-label">Community Members</div>
+        </div>
+        <!-- <div class="metric">
+          <div class="metric-val">—</div>
+          <div class="metric-label">Social Reach</div>
+        </div> -->
+        <div class="metric">
+          <div class="metric-val">12+</div>
+          <div class="metric-label">Animals Featured</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">Real</div>
+          <div class="metric-label">Lives Impacted</div>
+        </div>
+      </div>
+      <div class="scroll-ind">
+        <div class="scroll-line"></div>
+        Scroll
+      </div>
+    </section>
+
+    <!-- TICKER -->
+    <div class="ticker-wrap"><div class="ticker-inner" id="ticker"></div></div>
+
+    <!-- WHY SPARTN -->
+    <section id="why">
+      <span class="section-label reveal">Why We're Different</span>
+      <h2 class="section-title reveal">
+        Most Memecoins<br />Create Stories.<br /><span
+          style="color: var(--green)"
+          >We Already Have Them.</span
+        >
+      </h2>
+      <div class="why-grid">
+        <div class="why-image-stack reveal-left">
+          <img
+            class="why-img-main"
+            id="why-img-main"
+            src=""
+            alt="Rescue Story"
+          />
+          <img
+            class="why-img-secondary"
+            id="why-img-sec"
+            src=""
+            alt="SPARTN Rescue"
+          />
+          <div class="why-accent">
+            <div class="why-accent-val">Real</div>
+            <div class="why-accent-txt">Stories. Animals. Impact.</div>
+          </div>
+        </div>
+        <div class="reveal-right">
+          <p class="section-body">
+            Most crypto projects launch with hype. SPARTN launches with
+            something far more valuable, real animals with real stories that
+            build real emotional connections across social media.
+          </p>
+          <p class="section-body" style="margin-top: 16px">
+            The story exists before the token. The token simply brings that
+            story into Web3. Not to replace rescue work, to amplify it.
+          </p>
+          <div class="why-points" style="margin-top: clamp(24px, 3vw, 40px)">
+            <div class="why-point">
+              <div class="why-point-icon"><i class="fa-solid fa-paw"></i></div>
+              <div class="why-point-text">
+                <h4>Real Animals, Real Stories</h4>
+                <p>
+                  Monkeys, foxes, wolves, bobcats, lynx, not fictional mascots.
+                  Every animal has a rescue story that already moves people.
+                </p>
+              </div>
+            </div>
+            <div class="why-point">
+              <div class="why-point-icon">
+                <i class="fa-solid fa-tower-broadcast"></i>
+              </div>
+              <div class="why-point-text">
+                <h4>Built-in Content Engine</h4>
+                <p>
+                  Every rescue creates attention. Every story creates community.
+                  The narrative generates itself, organically.
+                </p>
+              </div>
+            </div>
+            <div class="why-point">
+              <div class="why-point-icon"><i class="fa-solid fa-bolt"></i></div>
+              <div class="why-point-text">
+                <h4>Purpose-Driven Momentum</h4>
+                <p>
+                  When people believe in something real, they become advocates.
+                  SPARTN gives the community a mission beyond speculation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- RESCUE ECONOMY -->
+    <section id="economy">
+      <span class="section-label reveal">How It Works</span>
+      <h2 class="section-title reveal">
+        The <span style="color: var(--green)">Rescue</span><br />Economy
+      </h2>
+      <p class="section-body reveal">
+        Every rescue fuels the next. Every story strengthens the community.
+        Every supporter grows the ecosystem. This is the loop that makes SPARTN
+        different.
+      </p>
+      <div class="economy-flow reveal">
+        <div class="flow-item">
+          <div class="flow-icon"></div>
+          <div class="flow-label">Rescue Story</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">
+          <div class="flow-icon"></div>
+          <div class="flow-label">Content Creation</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">
+          <div class="flow-icon"></div>
+          <div class="flow-label">Community Growth</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">
+          <div class="flow-icon"></div>
+          <div class="flow-label">Token Adoption</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">
+          <div class="flow-icon"></div>
+          <div class="flow-label">Expanded Capacity</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-item">
+          <div class="flow-icon"></div>
+          <div class="flow-label">More Stories</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- STORY VIDEO -->
+    <section id="story-video">
+      <div class="story-container">
+        <div class="story-text reveal-left">
+          <span class="section-label">The Story</span>
+          <h2 class="section-title">
+            Where It<br />All <span style="color: var(--green)">Began</span>
+          </h2>
+          <p class="section-body">
+            Before the token, before the community, there was a sanctuary.
+            Animals that had nowhere else to go. A mission that started quietly
+            and grew into something the internet couldn't ignore.
+          </p>
+          <p class="section-body" style="margin-top: 14px">
+            Watch the story behind SPARTN. The real animals. The real work. The
+            real reason this exists.
+          </p>
+        </div>
+        <div class="reveal-right">
+          <div
+            class="video-placeholder"
+            id="video-wrapper"
+            onclick="tryPlayVideo()"
+          >
+        
+            <video
+              id="story-vid"
+              src="./images/spartn_video.MP4"
+              preload="metadata"
+            ></video>
+            <div class="video-placeholder-bg" id="video-overlay"></div>
+            <div class="video-placeholder-inner" id="video-inner">
+              <div class="play-btn">▶</div>
+              <div class="video-label">Watch Our Story</div>
+              <div class="video-sublabel">
+                The rescue operation behind $SPARTN
+              </div>
+            </div>
+          </div>
+          <!-- <p class="video-dev-note">
+            <strong></strong>
+            <code></code>
+            <code></code>
+          </p> -->
+          <!-- <div class="video-upload-dev">
+            <span></span>
+            <label for="video-file-input"></label>
+            <input type="file" id="video-file-input" accept="video/*" />
+          </div> -->
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- GALLERY -->
+    <section id="gallery">
+      <div class="gallery-intro">
+        <div class="reveal-left">
+          <span class="section-label">Meet The Rescues</span>
+          <h2 class="section-title">
+            These Aren't<br /><span style="color: var(--green)"
+              >Characters.</span
+            ><br />They're Real.
+          </h2>
+        </div>
+        <div class="reveal-right">
+          <p class="section-body">
+            Every photo is a real animal with a real story. They found safety
+            when they had nowhere else to go. Now they're the heart of the
+            SPARTN movement.
+          </p>
+        </div>
+      </div>
+      <div class="gallery-grid" id="static-gallery"></div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- WHY WEB3 -->
+    <section id="web3">
+      <span class="section-label reveal">The Web3 Difference</span>
+      <div class="web3-grid">
+        <div>
+          <h2 class="section-title reveal">
+            Turning<br /><span style="color: var(--green)">Attention</span
+            ><br />Into Action
+          </h2>
+          <p class="section-body reveal">
+            Traditional fundraising relies on occasional donations. SPARTN
+            creates a decentralized community that helps amplify stories,
+            strengthen engagement, and build awareness that compounds over time.
+          </p>
+          <div class="web3-points">
+            <div class="web3-point reveal">
+              <div class="web3-num">01</div>
+              <div class="web3-text">
+                <h4>Web3 Creates Participation</h4>
+                <p>
+                  Token holders become stakeholders. They don't just watch the
+                  story — they're part of it.
+                </p>
+              </div>
+            </div>
+            <div class="web3-point reveal" style="transition-delay: 0.1s">
+              <div class="web3-num">02</div>
+              <div class="web3-text">
+                <h4>Participation Creates Momentum</h4>
+                <p>
+                  Every share, every holder, every conversation adds fuel to a
+                  movement that grows organically.
+                </p>
+              </div>
+            </div>
+            <div class="web3-point reveal" style="transition-delay: 0.2s">
+              <div class="web3-num">03</div>
+              <div class="web3-text">
+                <h4>Momentum Creates Impact</h4>
+                <p>
+                  Reach turns into rescue capacity. Community becomes a
+                  resource. Memes become a mission.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="web3-image reveal-right">
+          <img class="web3-img" id="web3-img" src="" alt="SPARTN Rescue Bond" />
+          <div class="web3-img-caption">
+            <strong>Real Bonds</strong>
+            <span
+              >The connection between the rescuers and the rescued. That's what
+              SPARTN is built on.</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- TOKEN UTILITY -->
+    <section id="utility">
+      <span class="section-label reveal">$SPARTN Token</span>
+      <h2 class="section-title reveal">
+        More Than<br />A <span style="color: var(--green)">Memecoin</span>
+      </h2>
+      <div class="utility-grid">
+        <div class="utility-card reveal">
+          <div class="utility-icon"><i class="fa-solid fa-film"></i></div>
+          <h3>Exclusive Content Access</h3>
+          <p>
+            Behind-the-scenes rescue stories and real-time updates for holders.
+          </p>
+        </div>
+        <div class="utility-card reveal" style="transition-delay: 0.08s">
+          <div class="utility-icon"><i class="fa-solid fa-bullhorn"></i></div>
+          <h3>Community Campaigns</h3>
+          <p>
+            Participate in community initiatives and ecosystem events that
+            matter.
+          </p>
+        </div>
+        <div class="utility-card reveal" style="transition-delay: 0.14s">
+          <div class="utility-icon"><i class="fa-solid fa-image"></i></div>
+          <h3>NFT Integrations</h3>
+          <p>
+            Future collections inspired by real rescue stories. Each one unique,
+            each one real.
+          </p>
+        </div>
+        <div class="utility-card reveal" style="transition-delay: 0.2s">
+          <div class="utility-icon"><i class="fa-solid fa-chart-bar"></i></div>
+          <h3>Rescue Mission Updates</h3>
+          <p>
+            Track rescue milestones and follow animal progress as they recover.
+          </p>
+        </div>
+        <div class="utility-card reveal" style="transition-delay: 0.26s">
+          <div class="utility-icon"><i class="fa-solid fa-gift"></i></div>
+          <h3>Reward Systems</h3>
+          <p>
+            Community participation incentives for the most dedicated
+            supporters.
+          </p>
+        </div>
+        <div class="utility-card reveal" style="transition-delay: 0.32s">
+          <div class="utility-icon"><i class="fa-solid fa-handshake"></i></div>
+          <h3>Partner Ecosystem</h3>
+          <p>
+            Future partnerships and opportunities built around shared values.
+          </p>
+        </div>
+        <div class="utility-card reveal" style="transition-delay: 0.38s">
+          <div class="utility-icon"><i class="fa-solid fa-vote-yea"></i></div>
+          <h3>Governance</h3>
+          <p>
+            Community voting on selected initiatives. Real say in how the
+            ecosystem evolves.
+          </p>
+        </div>
+        <div class="utility-card reveal" style="transition-delay: 0.44s">
+          <div class="utility-icon"><i class="fa-solid fa-star"></i></div>
+          <h3>Community Recognition</h3>
+          <p>
+            Status and recognition systems that reward the people who show up.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- TOKENOMICS -->
+    <section id="tokenomics">
+      <span class="section-label reveal">Distribution</span>
+      <h2 class="section-title reveal">
+        Token<span style="color: var(--green)">omics</span>
+      </h2>
+      <div class="token-layout">
+        <div class="reveal-left">
+          <div class="token-chart">
+            <svg class="donut-svg" viewBox="0 0 200 200" id="donut-svg"></svg>
+            <div class="donut-total">
+              <strong>1B</strong><span>$SPARTN</span>
+            </div>
+          </div>
+          <div class="token-info">
+            <div class="token-stat">
+              <div class="token-stat-val">$SPARTN</div>
+              <div class="token-stat-label">Token Name</div>
+            </div>
+            <div class="token-stat">
+              <div class="token-stat-val">1,000,000,000</div>
+              <div class="token-stat-label">Total Supply</div>
+            </div>
+            <div class="token-stat">
+              <div class="token-stat-val">TBA</div>
+              <div class="token-stat-label">Contract Address</div>
+            </div>
+          </div>
+        </div>
+        <div class="token-legend reveal-right" id="token-legend"></div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ROADMAP -->
+    <section id="roadmap">
+      <span class="section-label reveal">The Path Forward</span>
+      <h2 class="section-title reveal">
+        Road<span style="color: var(--green)">map</span>
+      </h2>
+      <div class="roadmap-track">
+        <div class="roadmap-phase reveal">
+          <div class="phase-dot"></div>
+          <div class="phase-num">Phase 01</div>
+          <div class="phase-title">Foundation</div>
+          <ul class="phase-items">
+            <li>Website Launch</li>
+            <li>Community Formation</li>
+            <li>Token Launch</li>
+            <li>Social Growth</li>
+          </ul>
+        </div>
+        <div class="roadmap-phase reveal" style="transition-delay: 0.12s">
+          <div
+            class="phase-dot"
+            style="background: rgba(57, 255, 20, 0.5); box-shadow: none"
+          ></div>
+          <div class="phase-num">Phase 02</div>
+          <div class="phase-title">Expansion</div>
+          <ul class="phase-items">
+            <li>Partnerships</li>
+            <li>Community Campaigns</li>
+            <li>Content Expansion</li>
+            <li>NFT Development</li>
+          </ul>
+        </div>
+        <div class="roadmap-phase reveal" style="transition-delay: 0.24s">
+          <div
+            class="phase-dot"
+            style="background: rgba(57, 255, 20, 0.3); box-shadow: none"
+          ></div>
+          <div class="phase-num">Phase 03</div>
+          <div class="phase-title">Utility</div>
+          <ul class="phase-items">
+            <li>Reward Systems</li>
+            <li>Governance Features</li>
+            <li>Ecosystem Growth</li>
+            <li>Global Community</li>
+          </ul>
+        </div>
+        <div class="roadmap-phase reveal" style="transition-delay: 0.36s">
+          <div
+            class="phase-dot"
+            style="background: rgba(57, 255, 20, 0.15); box-shadow: none"
+          ></div>
+          <div class="phase-num">Phase 04</div>
+          <div class="phase-title">Scale</div>
+          <ul class="phase-items">
+            <li>International Brand</li>
+            <li>Rescue Expansion</li>
+            <li>Long-Term Sustainability</li>
+            <li>Industry Recognition</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- COMMUNITY -->
+    <section id="community">
+      <span
+        class="section-label reveal"
+        style="display: block; text-align: center"
+        >Join The Movement</span
+      >
+      <h2 class="community-title reveal">
+        Support<br />The <em>Mission.</em><br />Build<br />The Future.
+      </h2>
+      <p class="community-body reveal">
+        You don't just buy $SPARTN. You become part of something real. A
+        community with a story to tell and the will to tell it louder.
+      </p>
+      <div class="social-links reveal">
+        <a href="https://t.me/+QYg5V0yZXIFlYTcx" class="social-card"
+          ><span class="social-icon"><i class="fa-brands fa-telegram"></i></span
+          ><span class="social-name">Telegram</span></a
+        >
+        <a href="https://x.com/SPARTNrescues?s=20" class="social-card"
+          ><span class="social-icon"><i class="fa-brands fa-twitter"></i></span
+          ><span class="social-name">X (Twitter)</span></a
+        >
+        <a href="#" class="social-card"
+          ><span class="social-icon"><i class="fa-brands fa-discord"></i></span
+          ><span class="social-name">Discord</span></a
+        >
+        <a href="https://www.spartn.org" class="social-card" target="_blank"
+          ><span class="social-icon"><i class="fa-brands fa-globe"></i></span
+          ><span class="social-name">Sanctuary</span></a
+        >
+      </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- FAQ -->
+    <div id="faq" style="background: var(--bg)">
+      <div class="faq-wrap">
+        <span class="section-label reveal">Questions</span>
+        <h2 class="section-title reveal">FAQ</h2>
+        <div class="faq-list">
+          <div class="faq-item reveal">
+            <div class="faq-q" onclick="toggleFAQ(this)">
+              What is SPARTN?<span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-a">
+              SPARTN ($SPARTN) is a Web3 memecoin backed by a real animal rescue
+              sanctuary. Unlike most tokens built purely on internet culture,
+              SPARTN is fueled by genuine rescue stories, real animals, and a
+              growing community that believes in something bigger than
+              speculation.
+            </div>
+          </div>
+          <div class="faq-item reveal" style="transition-delay: 0.08s">
+            <div class="faq-q" onclick="toggleFAQ(this)">
+              Why is SPARTN different?<span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-a">
+              The story already exists. Most projects create hype and then
+              scramble to build a narrative. SPARTN has a living, breathing
+              sanctuary generating real content every single day. That's a
+              compounding content engine no marketing budget can replicate.
+            </div>
+          </div>
+          <div class="faq-item reveal" style="transition-delay: 0.14s">
+            <div class="faq-q" onclick="toggleFAQ(this)">
+              How does the ecosystem work?<span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-a">
+              It's a self-reinforcing loop. Rescues create stories. Stories
+              create attention. Attention builds community. Community grows
+              token adoption. Token adoption expands capacity. Expanded capacity
+              means more rescues, stronger every time.
+            </div>
+          </div>
+          <div class="faq-item reveal" style="transition-delay: 0.2s">
+            <div class="faq-q" onclick="toggleFAQ(this)">
+              What utility does $SPARTN provide?<span class="faq-toggle"
+                >+</span
+              >
+            </div>
+            <div class="faq-a">
+              Holders gain access to exclusive rescue content, community
+              campaigns, NFT integrations, reward systems, governance
+              participation, and partner ecosystem benefits. More utility rolls
+              out across each roadmap phase.
+            </div>
+          </div>
+          <div class="faq-item reveal" style="transition-delay: 0.26s">
+            <div class="faq-q" onclick="toggleFAQ(this)">
+              How can I participate?<span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-a">
+              Buy $SPARTN to join the ecosystem. Follow the project on Telegram,
+              X, and Discord to stay ahead of launches, events, and rescue
+              updates. The community is where the real movement lives.
+            </div>
+          </div>
+          <div class="faq-item reveal" style="transition-delay: 0.32s">
+            <div class="faq-q" onclick="toggleFAQ(this)">
+              What is the long-term vision?<span class="faq-toggle">+</span>
+            </div>
+            <div class="faq-a">
+              To become one of the most recognizable purpose-driven memecoins in
+              crypto — not because we said so, but because we have the stories,
+              the community, and the mission to earn it. SPARTN is built for the
+              long game.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-top">
+        <div class="footer-brand">
+          <img id="footer-logo" src="" alt="SPARTN" />
+          <p>
+            A memecoin backed by real rescue stories. Powered by Web3. Driven by
+            community.
+          </p>
+          <div class="footer-contract">
+            CA: <span>[Contract Address — TBA]</span>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Navigate</h4>
+          <a href="#why">Why SPARTN</a>
+          <a href="#gallery">Meet The Rescues</a>
+          <a href="#tokenomics">Tokenomics</a>
+          <a href="#roadmap">Roadmap</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <a href="https://t.me/+QYg5V0yZXIFlYTcx">Telegram</a>
+          <a href="https://x.com/SPARTNrescues?s=20">X</a>
+          <a href="#">Discord</a>
+          <a href="https://www.spartn.org" target="_blank">Sanctuary Site</a>
+        </div>
+        <div class="footer-col">
+          <h4>Token</h4>
+          <a href="#">Buy $SPARTN</a>
+          <a href="#tokenomics">Tokenomics</a>
+          <a href="#roadmap">Roadmap</a>
+          <a href="#utility">Utility</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">© 2025 SPARTN. All rights reserved.</span>
+        <div class="footer-social">
+          <a href="https://t.me/+QYg5V0yZXIFlYTcx"
+            ><i class="fa-brands fa-telegram"></i
+          ></a>
+          <a href="https://x.com/SPARTNrescues?s=20"
+            ><i class="fa-brands fa-twitter"></i
+          ></a>
+          <a href="#"><i class="fa-brands fa-discord"></i></a>
+        </div>
+        <p class="footer-disclaimer">
+          $SPARTN is a memecoin. Nothing on this website constitutes financial
+          advice. Cryptocurrency involves risk. Always do your own research
+          before investing.
+        </p>
+      </div>
+    </footer>
+
+    <script src="images.js"></script>
+    <script>
+      const IMGS = window.SPARTN_IMAGES;
+
+      function assignImages() {
+        ["loader-logo", "nav-logo", "footer-logo"].forEach(
+          (id) => (document.getElementById(id).src = IMGS.logo_dark),
+        );
+        document.getElementById("hero-bg").style.backgroundImage =
+          `url(${IMGS.hero1})`;
+        document.getElementById("why-img-main").src = IMGS.hero2;
+        document.getElementById("why-img-sec").src = IMGS.portrait;
+        document.getElementById("web3-img").src = IMGS.hug;
+      }
+
+      const galleryData = [
+        {
+          img: IMGS.hero1,
+          name: "Spider Monkey",
+          story:
+            "Rescued from illegal captivity. Now thriving in sanctuary care.",
+          status: "Thriving",
+        },
+        {
+          img: IMGS.cage1,
+          name: "Marmoset",
+          story:
+            "Found malnourished. Weeks of round-the-clock care brought her back.",
+          status: "Recovering",
+        },
+        {
+          img: IMGS.hero2,
+          name: "Capuchin",
+          story:
+            "Confiscated from a pet trade operation. One of our first rescues.",
+          status: "Sanctuary Resident",
+        },
+        {
+          img: IMGS.monkey_tree,
+          name: "Long-tailed Macaque",
+          story:
+            "Arrived frightened. Now one of the most confident animals at the sanctuary.",
+          status: "Thriving",
+        },
+        {
+          img: IMGS.face_to_face,
+          name: "Spider Monkey Group",
+          story:
+            "A family unit separated and reunited. Watching them bond again was unforgettable.",
+          status: "Bonded Group",
+        },
+        {
+          img: IMGS.spider_monkey,
+          name: "Capuchin — Close Up",
+          story:
+            "Those eyes tell the whole story. Came in silent. Now she's the loudest in the group.",
+          status: "Sanctuary Resident",
+        },
+      ];
+
+      function buildGallery() {
+        const grid = document.getElementById("static-gallery");
+        galleryData.forEach((item, i) => {
+          const card = document.createElement("div");
+          card.className = "gallery-card reveal";
+          card.style.transitionDelay = i * 0.08 + "s";
+          card.innerHTML = `<img src="${item.img}" alt="${item.name}" loading="lazy"><div class="gallery-card-overlay"><div class="gallery-card-info"><h3>${item.name}</h3><p>${item.story}</p><span class="gallery-status">${item.status}</span></div></div>`;
+          grid.appendChild(card);
+        });
+        observeReveal();
+      }
+
+      const tokenData = [
+        { label: "Community & Liquidity", pct: 40, color: "#39FF14" },
+        { label: "Ecosystem Growth", pct: 20, color: "#27C93F" },
+        { label: "Rescue Expansion Fund", pct: 15, color: "#5DFF3F" },
+        { label: "Marketing", pct: 10, color: "#1a8c27" },
+        { label: "Strategic Partnerships", pct: 10, color: "#0d5c1a" },
+        { label: "Team & Development", pct: 5, color: "#073d11" },
+      ];
+      function buildDonut() {
+        const svg = document.getElementById("donut-svg");
+        const legend = document.getElementById("token-legend");
+        const circ = 2 * Math.PI * 70;
+        let cum = 0;
+        tokenData.forEach((d, i) => {
+          const da = (d.pct / 100) * circ;
+          const c = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "circle",
+          );
+          c.setAttribute("cx", 100);
+          c.setAttribute("cy", 100);
+          c.setAttribute("r", 70);
+          c.setAttribute("fill", "none");
+          c.setAttribute("stroke", d.color);
+          c.setAttribute("stroke-width", 28);
+          c.setAttribute("stroke-dasharray", `${da} ${circ - da}`);
+          c.setAttribute(
+            "stroke-dashoffset",
+            -(circ - (cum / 100) * circ) + circ,
+          );
+          svg.appendChild(c);
+          cum += d.pct;
+          legend.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${d.color}"></div><div class="legend-text"><strong>${d.label}</strong><span>${d.pct}% of supply</span></div><div class="legend-pct" style="color:${d.color}">${d.pct}%</div></div>`;
+        });
+      }
+
+      function initParticles() {
+        const canvas = document.getElementById("particles");
+        const ctx = canvas.getContext("2d");
+        const resize = () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        };
+        resize();
+        window.addEventListener("resize", resize);
+        const pts = Array.from({ length: 50 }, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.4 + 0.2,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          a: Math.random() * 0.4 + 0.1,
+        }));
+        (function draw() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          pts.forEach((p) => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(57,255,20,${p.a})`;
+            ctx.fill();
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+          });
+          requestAnimationFrame(draw);
+        })();
+      }
+
+      function initParallax() {
+        const bg = document.getElementById("hero-bg");
+        const isMobile = () => window.innerWidth <= 768;
+        window.addEventListener("scroll", () => {
+          if (!isMobile())
+            bg.style.transform = `translateY(${window.scrollY * 0.4}px)`;
+        });
+      }
+
+      function observeReveal() {
+        const obs = new IntersectionObserver(
+          (entries) =>
+            entries.forEach((e) => {
+              if (e.isIntersecting) e.target.classList.add("visible");
+            }),
+          { threshold: 0.08 },
+        );
+        document
+          .querySelectorAll(".reveal,.reveal-left,.reveal-right")
+          .forEach((el) => obs.observe(el));
+      }
+
+      function initNav() {
+        const nav = document.getElementById("nav");
+        window.addEventListener("scroll", () =>
+          nav.classList.toggle("scrolled", window.scrollY > 60),
+        );
+      }
+
+      function buildTicker() {
+        const items = [
+          "$SPARTN — The Rescue Economy",
+          "Real Animals. Real Stories.",
+          "Powered By Web3",
+          "Built On Purpose",
+          "Join The Movement",
+          "1,000,000,000 Total Supply",
+          "Community Driven",
+        ];
+        const el = document.getElementById("ticker");
+        const row = items
+          .map((i) => `<span class="ticker-item">● <span>${i}</span></span>`)
+          .join("");
+        el.innerHTML = row + row + row;
+      }
+
+      // Mobile menu
+      function toggleMenu() {
+        const h = document.getElementById("hamburger");
+        const m = document.getElementById("mobileMenu");
+        h.classList.toggle("open");
+        m.classList.toggle("open");
+        document.body.style.overflow = m.classList.contains("open")
+          ? "hidden"
+          : "";
+      }
+      function closeMenu() {
+        document.getElementById("hamburger").classList.remove("open");
+        document.getElementById("mobileMenu").classList.remove("open");
+        document.body.style.overflow = "";
+      }
+
+      // Cursor (desktop only)
+      function initCursor() {
+        if (window.matchMedia("(hover:none)").matches) return;
+        const cursor = document.getElementById("cursor");
+        const ring = document.getElementById("cursorRing");
+        let mx = 0,
+          my = 0,
+          rx = 0,
+          ry = 0;
+        document.addEventListener("mousemove", (e) => {
+          mx = e.clientX;
+          my = e.clientY;
+          cursor.style.transform = `translate(${mx - 5}px,${my - 5}px)`;
+        });
+        (function a() {
+          rx += (mx - rx - 17) * 0.12;
+          ry += (my - ry - 17) * 0.12;
+          ring.style.transform = `translate(${rx}px,${ry}px)`;
+          requestAnimationFrame(a);
+        })();
+        document
+          .querySelectorAll("a,button,.gallery-card,.flow-item")
+          .forEach((el) => {
+            el.addEventListener("mouseenter", () => {
+              ring.style.width = "56px";
+              ring.style.height = "56px";
+            });
+            el.addEventListener("mouseleave", () => {
+              ring.style.width = "34px";
+              ring.style.height = "34px";
+            });
+          });
+      }
+
+      function toggleFAQ(el) {
+        el.parentElement.classList.toggle("open");
+      }
+
+      function tryPlayVideo() {
+        const vid = document.getElementById("story-vid");
+        if (vid.src && vid.src !== window.location.href) {
+          vid.style.display = "block";
+          document.getElementById("video-overlay").style.display = "none";
+          document.getElementById("video-inner").style.display = "none";
+          vid.play();
+        }
+      }
+      // document
+      //   .getElementById("video-file-input")
+      //   .addEventListener("change", function (e) {
+      //     const file = e.target.files[0];
+      //     if (!file) return;
+      //     const vid = document.getElementById("story-vid");
+      //     vid.src = URL.createObjectURL(file);
+      //     vid.style.display = "block";
+      //     document.getElementById("video-overlay").style.display = "none";
+      //     document.getElementById("video-inner").style.display = "none";
+      //     vid.play();
+      //   });
+
+      function hideLoader() {
+        setTimeout(() => {
+          document.getElementById("loader").classList.add("hidden");
+          setTimeout(() => document.getElementById("loader").remove(), 700);
+        }, 2300);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        assignImages();
+        buildGallery();
+        buildDonut();
+        buildTicker();
+        initParticles();
+        initParallax();
+        initNav();
+        initCursor();
+        observeReveal();
+        hideLoader();
+      });
+    </script>
+  </body>
+</html>
